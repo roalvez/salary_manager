@@ -4,7 +4,8 @@ class HomeController < ApplicationController
 
   def create
     calculator = SalaryCalculatorService.new(
-      hourly_wage: params[:hourly_wage],
+      salary_amount: params[:salary_amount],
+      salary_type: params[:salary_type],
       daily_hours: params[:daily_hours],
       weekly_hours: params[:weekly_hours],
       selected_month: params[:selected_month],
@@ -30,6 +31,9 @@ class HomeController < ApplicationController
     @currency_code = results[:currency_code]
     @exchange_rate = results[:exchange_rate]
     @has_conversion = results[:has_conversion]
+    @daily_hours = results[:daily_hours]
+    @weekly_hours = results[:weekly_hours]
+    @weeks_per_month = results[:weeks_per_month]
 
     respond_to do |format|
       format.turbo_stream

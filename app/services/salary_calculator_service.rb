@@ -1,8 +1,9 @@
 class SalaryCalculatorService
-  attr_reader :hourly_wage, :daily_hours, :weekly_hours, :selected_month, :currency
+  attr_reader :salary_amount, :salary_type, :daily_hours, :weekly_hours, :selected_month, :currency
 
-  def initialize(hourly_wage:, daily_hours: 8, weekly_hours: 40, selected_month: nil, currency: nil)
-    @hourly_wage = hourly_wage.to_f
+  def initialize(salary_amount:, salary_type: 'hourly', daily_hours: 8, weekly_hours: 40, selected_month: nil, currency: nil)
+    @salary_amount = salary_amount.to_f
+    @salary_type = salary_type || 'hourly'
     @daily_hours = daily_hours.to_f > 0 ? daily_hours.to_f : 8
     @weekly_hours = weekly_hours.to_f > 0 ? weekly_hours.to_f : 40
     @selected_month = selected_month
@@ -26,11 +27,27 @@ class SalaryCalculatorService
       currency_symbol: currency_symbol,
       currency_code: currency || 'USD',
       exchange_rate: exchange_rate,
-      has_conversion: currency.present?
+      has_conversion: currency.present?,
+      daily_hours: daily_hours,
+      weekly_hours: weekly_hours,
+      weeks_per_month: weeks_per_month
     }
   end
 
   private
+
+  def hourly_wage
+    @hourly_wage ||= case salary_type
+    when 'hourly'
+      salary_amount
+    when 'monthly'
+      salary_amount / (weekly_hours * weeks_per_month)
+    when 'annual'
+      salary_amount / (weekly_hours * 52.0)
+    else
+      salary_amount
+    end
+  end
 
   def daily_wage
     @daily_wage ||= hourly_wage * daily_hours
